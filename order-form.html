@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обработка на поръчки</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #764ba2;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        select {
+            background: white;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+        }
+
+        .btn-clear {
+            background: #f56565;
+            margin-top: 10px;
+        }
+
+        .order-summary {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .order-summary.active {
+            display: block;
+        }
+
+        .summary-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .summary-header h2 {
+            color: #667eea;
+            font-size: 26px;
+            border: none;
+            margin: 0;
+        }
+
+        .summary-section {
+            margin-bottom: 25px;
+        }
+
+        .summary-section h3 {
+            color: #764ba2;
+            font-size: 18px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .summary-value {
+            color: #333;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .total-price {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button-group .btn {
+            margin-top: 0;
+        }
+
+        .price-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .price-input-group .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="formSection" class="card">
+            <h1>📦 Нова поръчка</h1>
+            
+            <form id="orderForm">
+                <h2>👤 Данни за клиент</h2>
+                
+                <div class="form-group">
+                    <label for="customerName">Две имена *</label>
+                    <input type="text" id="customerName" required placeholder="Иван Петров">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Телефон *</label>
+                    <input type="tel" id="phone" required placeholder="0888 123 456">
+                </div>
+
+                <div class="form-group">
+                    <label for="office">Офис на Еконт / Спиди *</label>
+                    <input type="text" id="office" required placeholder="Еконт - София, ул. Витоша 1">
+                </div>
+
+                <h2>📋 Данни за поръчка</h2>
+
+                <div class="form-group">
+                    <label for="product">Продукт *</label>
+                    <select id="product" required>
+                        <option value="">Избери продукт...</option>
+                        <option value="Изолация Polynor Pro">Изолация Polynor Pro</option>
+                        <option value="Изолация Polynor Home">Изолация Polynor Home</option>
+                        <option value="Монтажна пяна Polynor Premium Mega Pro 70">Монтажна пяна Polynor Premium Mega Pro 70</option>
+                        <option value="Монтажна пяна Polynor Windows & Doors">Монтажна пяна Polynor Windows & Doors</option>
+                        <option value="Полиуретаново лепило Polynor Fixo">Полиуретаново лепило Polynor Fixo</option>
+                        <option value="Чистител за полиуретанова пяна Insola Foam Cleaner">Чистител за полиуретанова пяна Insola Foam Cleaner</option>
+                        <option value="Монтажен пистолет Premium Gun">Монтажен пистолет Premium Gun</option>
+                        <option value="Монтажен пистолет Insola Gun Foam">Монтажен пистолет Insola Gun Foam</option>
+                        <option value="Монтажен накрайник">Монтажен накрайник</option>
+                    </select>
+                </div>
+
+                <div class="price-input-group">
+                    <div class="form-group">
+                        <label for="quantity">Количество *</label>
+                        <input type="number" id="quantity" required min="1" value="1" placeholder="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="price">Цена (лв.) *</label>
+                        <input type="number" id="price" required min="0" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="totalPrice">Обща цена (лв.)</label>
+                    <input type="text" id="totalPrice" readonly placeholder="0.00 лв." style="background: #f9f9f9; font-weight: bold; color: #667eea;">
+                </div>
+
+                <button type="submit" class="btn">Генерирай поръчка</button>
+            </form>
+        </div>
+
+        <div id="orderSummary" class="order-summary">
+            <div class="summary-header">
+                <h2>✅ ПОРЪЧКА</h2>
+                <div id="orderDate" style="color: #666; font-size: 14px; margin-top: 5px;"></div>
+            </div>
+
+            <div class="summary-section">
+                <h3>Клиент</h3>
+                <div class="summary-row">
+                    <span class="summary-label">Име:</span>
+                    <span class="summary-value" id="summaryName"></span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Телефон:</span>
+                    <span class="summary-value" id="summaryPhone"></span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Офис:</span>
+                    <span class="summary-value" id="summaryOffice"></span>
+                </div>
+            </div>
+
+            <div class="summary-section">
+                <h3>Поръчка</h3>
+                <div class="summary-row">
+                    <span class="summary-label">Продукт:</span>
+                    <span class="summary-value" id="summaryProduct"></span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Количество:</span>
+                    <span class="summary-value" id="summaryQuantity"></span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Единична цена:</span>
+                    <span class="summary-value" id="summaryPrice"></span>
+                </div>
+            </div>
+
+            <div class="total-price">
+                ОБЩА ЦЕНА: <span id="summaryTotal"></span>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="shareOrder()">📤 Сподели</button>
+                <button class="btn btn-clear" onclick="newOrder()">🔄 Нова поръчка</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const quantityInput = document.getElementById('quantity');
+        const priceInput = document.getElementById('price');
+        const totalPriceInput = document.getElementById('totalPrice');
+        const orderForm = document.getElementById('orderForm');
+
+        // Calculate total price automatically
+        function calculateTotal() {
+            const quantity = parseFloat(quantityInput.value) || 0;
+            const price = parseFloat(priceInput.value) || 0;
+            const total = (quantity * price).toFixed(2);
+            totalPriceInput.value = total + ' лв.';
+        }
+
+        quantityInput.addEventListener('input', calculateTotal);
+        priceInput.addEventListener('input', calculateTotal);
+
+        // Handle form submission
+        orderForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Get form values
+            const customerName = document.getElementById('customerName').value;
+            const phone = document.getElementById('phone').value;
+            const office = document.getElementById('office').value;
+            const product = document.getElementById('product').value;
+            const quantity = document.getElementById('quantity').value;
+            const price = parseFloat(document.getElementById('price').value).toFixed(2);
+            const total = (quantity * price).toFixed(2);
+
+            // Fill summary
+            document.getElementById('summaryName').textContent = customerName;
+            document.getElementById('summaryPhone').textContent = phone;
+            document.getElementById('summaryOffice').textContent = office;
+            document.getElementById('summaryProduct').textContent = product;
+            document.getElementById('summaryQuantity').textContent = quantity + ' бр.';
+            document.getElementById('summaryPrice').textContent = price + ' лв.';
+            document.getElementById('summaryTotal').textContent = total + ' лв.';
+
+            // Set current date
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('bg-BG', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('orderDate').textContent = dateStr;
+
+            // Show summary, hide form
+            document.getElementById('formSection').classList.add('hidden');
+            document.getElementById('orderSummary').classList.add('active');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        });
+
+        function shareOrder() {
+            const summaryElement = document.getElementById('orderSummary');
+            const name = document.getElementById('summaryName').textContent;
+            const phone = document.getElementById('summaryPhone').textContent;
+            const office = document.getElementById('summaryOffice').textContent;
+            const product = document.getElementById('summaryProduct').textContent;
+            const quantity = document.getElementById('summaryQuantity').textContent;
+            const price = document.getElementById('summaryPrice').textContent;
+            const total = document.getElementById('summaryTotal').textContent;
+
+            const text = `ПОРЪЧКА\n\n` +
+                        `КЛИЕНТ:\n` +
+                        `Име: ${name}\n` +
+                        `Телефон: ${phone}\n` +
+                        `Офис: ${office}\n\n` +
+                        `ПОРЪЧКА:\n` +
+                        `Продукт: ${product}\n` +
+                        `Количество: ${quantity}\n` +
+                        `Единична цена: ${price}\n\n` +
+                        `ОБЩА ЦЕНА: ${total}`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Поръчка',
+                    text: text
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                // Fallback - copy to clipboard
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Поръчката е копирана! Можеш да я споделиш.');
+                });
+            }
+        }
+
+        function newOrder() {
+            // Reset form
+            orderForm.reset();
+            totalPriceInput.value = '';
+
+            // Show form, hide summary
+            document.getElementById('orderSummary').classList.remove('active');
+            document.getElementById('formSection').classList.remove('hidden');
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
