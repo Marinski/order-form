@@ -525,14 +525,14 @@
                 </div>
                 
                 <div class="price-quantity-row">
-                    <div class="form-group price-input">
-                        <label>Цена (лв.) *</label>
-                        <input type="number" id="price${productCounter}" required min="0" step="0.01" placeholder="0.00" onchange="updateProduct(${productCounter})">
-                    </div>
-                    
                     <div class="form-group quantity-input">
                         <label>Количество *</label>
                         <input type="number" id="quantity${productCounter}" required min="1" value="1" onchange="updateProduct(${productCounter})">
+                    </div>
+                    
+                    <div class="form-group price-input">
+                        <label>Цена (лв.) *</label>
+                        <input type="number" id="price${productCounter}" required min="0" step="0.01" placeholder="0.00" onchange="updateProduct(${productCounter})">
                     </div>
                     
                     <div class="product-total" id="productTotal${productCounter}">0.00 лв.</div>
