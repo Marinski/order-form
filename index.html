@@ -16,11 +16,15 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
         }
 
         .container {
             max-width: 600px;
             margin: 0 auto;
+            position: relative;
+            overflow-x: hidden;
         }
 
         .card {
@@ -67,6 +71,8 @@
             transition: border-color 0.3s;
             -webkit-appearance: none;
             appearance: none;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
         }
 
         input:focus, select:focus {
@@ -246,6 +252,18 @@
                 min-width: 60px;
                 font-size: 13px;
             }
+
+            /* Prevent zoom cropping issues on mobile */
+            body {
+                position: fixed;
+                width: 100%;
+            }
+            
+            .container {
+                height: 100vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
         }
 
         .hidden {
@@ -340,8 +358,13 @@
         }
 
         .price-input input {
-            font-size: 14px;
-            padding: 8px 10px;
+            font-size: 16px !important;
+            padding: 10px 12px;
+        }
+
+        /* Ensure consistent font size for all number inputs to prevent zoom */
+        input[type="number"] {
+            font-size: 16px !important;
         }
 
         .quantity-controls {
