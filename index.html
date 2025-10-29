@@ -221,10 +221,148 @@
                 font-size: 16px;
                 padding: 15px;
             }
+
+            .product-item {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            .price-quantity-row {
+                gap: 6px;
+            }
+
+            .quantity-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 16px;
+            }
+
+            .quantity-display {
+                min-width: 30px;
+                font-size: 13px;
+            }
+
+            .product-total {
+                min-width: 60px;
+                font-size: 13px;
+            }
         }
 
         .hidden {
             display: none;
+        }
+
+        .total-price-input {
+            background: #f9f9f9 !important;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .order-date {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        #addressGroup {
+            display: none;
+        }
+
+        .product-item {
+            background: #f8f9ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .product-number {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 14px;
+        }
+
+        .remove-product {
+            background: #f56565;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-display {
+            min-width: 35px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .product-select {
+            margin-bottom: 10px;
+        }
+
+        .price-quantity-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .price-input {
+            flex: 1;
+        }
+
+        .price-input input {
+            font-size: 14px;
+            padding: 8px 10px;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .product-total {
+            min-width: 70px;
+            text-align: right;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .btn-add-product {
+            background: #48bb78;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -247,43 +385,31 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="office">Офис на Еконт / Спиди *</label>
-                    <input type="text" id="office" required placeholder="Еконт - София, ул. Витоша 1">
-                </div>
-
-                <h2>📋 Данни за поръчка</h2>
-
-                <div class="form-group">
-                    <label for="product">Продукт *</label>
-                    <select id="product" required>
-                        <option value="">Избери продукт...</option>
-                        <option value="Изолация Polynor Pro">Изолация Polynor Pro</option>
-                        <option value="Изолация Polynor Home">Изолация Polynor Home</option>
-                        <option value="Монтажна пяна Polynor Premium Mega Pro 70">Монтажна пяна Polynor Premium Mega Pro 70</option>
-                        <option value="Монтажна пяна Polynor Windows & Doors">Монтажна пяна Polynor Windows & Doors</option>
-                        <option value="Полиуретаново лепило Polynor Fixo">Полиуретаново лепило Polynor Fixo</option>
-                        <option value="Чистител за полиуретанова пяна Insola Foam Cleaner">Чистител за полиуретанова пяна Insola Foam Cleaner</option>
-                        <option value="Монтажен пистолет Premium Gun">Монтажен пистолет Premium Gun</option>
-                        <option value="Монтажен пистолет Insola Gun Foam">Монтажен пистолет Insola Gun Foam</option>
-                        <option value="Монтажен накрайник">Монтажен накрайник</option>
+                    <label for="deliveryType">Начин на доставка *</label>
+                    <select id="deliveryType" required onchange="toggleAddressField()">
+                        <option value="">Избери начин на доставка...</option>
+                        <option value="econt">Офис на Еконт</option>
+                        <option value="speedy">Офис на Спиди</option>
+                        <option value="address">До адрес</option>
                     </select>
                 </div>
 
-                <div class="price-input-group">
-                    <div class="form-group">
-                        <label for="quantity">Количество *</label>
-                        <input type="number" id="quantity" required min="1" value="1" placeholder="1">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="price">Цена (лв.) *</label>
-                        <input type="number" id="price" required min="0" step="0.01" placeholder="0.00">
-                    </div>
+                <div class="form-group" id="addressGroup">
+                    <label for="address" id="addressLabel">Адрес за доставка *</label>
+                    <input type="text" id="address" placeholder="Адрес или офис...">
                 </div>
+
+                <h2>📋 Продукти</h2>
+
+                <div id="productsList">
+                    <!-- Products will be added here dynamically -->
+                </div>
+
+                <button type="button" class="btn btn-add-product" onclick="addProduct()">➕ Добави продукт</button>
 
                 <div class="form-group">
                     <label for="totalPrice">Обща цена (лв.)</label>
-                    <input type="text" id="totalPrice" readonly placeholder="0.00 лв." style="background: #f9f9f9; font-weight: bold; color: #667eea;">
+                    <input type="text" id="totalPrice" readonly placeholder="0.00 лв." class="total-price-input">
                 </div>
 
                 <button type="submit" class="btn">Генерирай поръчка</button>
@@ -293,7 +419,7 @@
         <div id="orderSummary" class="order-summary">
             <div class="summary-header">
                 <h2>✅ ПОРЪЧКА</h2>
-                <div id="orderDate" style="color: #666; font-size: 14px; margin-top: 5px;"></div>
+                <div id="orderDate" class="order-date"></div>
             </div>
 
             <div class="summary-section">
@@ -307,24 +433,19 @@
                     <span class="summary-value" id="summaryPhone"></span>
                 </div>
                 <div class="summary-row">
-                    <span class="summary-label">Офис:</span>
-                    <span class="summary-value" id="summaryOffice"></span>
+                    <span class="summary-label">Доставка:</span>
+                    <span class="summary-value" id="summaryDeliveryType"></span>
+                </div>
+                <div class="summary-row hidden" id="summaryAddressRow">
+                    <span class="summary-label">Адрес:</span>
+                    <span class="summary-value" id="summaryAddress"></span>
                 </div>
             </div>
 
             <div class="summary-section">
-                <h3>Поръчка</h3>
-                <div class="summary-row">
-                    <span class="summary-label">Продукт:</span>
-                    <span class="summary-value" id="summaryProduct"></span>
-                </div>
-                <div class="summary-row">
-                    <span class="summary-label">Количество:</span>
-                    <span class="summary-value" id="summaryQuantity"></span>
-                </div>
-                <div class="summary-row">
-                    <span class="summary-label">Единична цена:</span>
-                    <span class="summary-value" id="summaryPrice"></span>
+                <h3>Поръчани продукти</h3>
+                <div id="summaryProducts">
+                    <!-- Products will be listed here -->
                 </div>
             </div>
 
@@ -340,43 +461,202 @@
     </div>
 
     <script>
-        const quantityInput = document.getElementById('quantity');
-        const priceInput = document.getElementById('price');
-        const totalPriceInput = document.getElementById('totalPrice');
+        let products = [];
+        let productCounter = 0;
         const orderForm = document.getElementById('orderForm');
 
-        // Calculate total price automatically
-        function calculateTotal() {
-            const quantity = parseFloat(quantityInput.value) || 0;
-            const price = parseFloat(priceInput.value) || 0;
-            const total = (quantity * price).toFixed(2);
-            totalPriceInput.value = total + ' лв.';
+        const productOptions = [
+            'Изолация Polynor Pro',
+            'Изолация Polynor Home',
+            'Монтажна пяна Polynor Premium Mega Pro 70',
+            'Монтажна пяна Polynor Windows & Doors',
+            'Полиуретаново лепило Polynor Fixo',
+            'Чистител за полиуретанова пяна Insola Foam Cleaner',
+            'Монтажен пистолет Premium Gun',
+            'Монтажен пистолет Insola Gun Foam',
+            'Монтажен накрайник'
+        ];
+
+        function toggleAddressField() {
+            const deliveryType = document.getElementById('deliveryType').value;
+            const addressGroup = document.getElementById('addressGroup');
+            const addressLabel = document.getElementById('addressLabel');
+            
+            if (deliveryType === 'address') {
+                addressGroup.style.display = 'block';
+                addressLabel.textContent = 'Адрес за доставка *';
+                document.getElementById('address').placeholder = 'ул. Витоша 1, София';
+            } else if (deliveryType === 'econt' || deliveryType === 'speedy') {
+                addressGroup.style.display = 'block';
+                const company = deliveryType === 'econt' ? 'Еконт' : 'Спиди';
+                addressLabel.textContent = `Офис на ${company} *`;
+                document.getElementById('address').placeholder = `${company} - София, ул. Витоша 1`;
+            } else {
+                addressGroup.style.display = 'none';
+            }
         }
 
-        quantityInput.addEventListener('input', calculateTotal);
-        priceInput.addEventListener('input', calculateTotal);
+        function addProduct() {
+            productCounter++;
+            const productsList = document.getElementById('productsList');
+            
+            const productDiv = document.createElement('div');
+            productDiv.className = 'product-item';
+            productDiv.setAttribute('data-product-id', productCounter);
+            
+            productDiv.innerHTML = `
+                <div class="product-header">
+                    <span class="product-number">Продукт #${productCounter}</span>
+                    <button type="button" class="remove-product" onclick="removeProduct(${productCounter})">×</button>
+                </div>
+                
+                <div class="form-group product-select">
+                    <select id="product${productCounter}" required onchange="updateProduct(${productCounter})">
+                        <option value="">Избери продукт...</option>
+                        ${productOptions.map(option => `<option value="${option}">${option}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div class="price-quantity-row">
+                    <div class="form-group price-input">
+                        <label>Цена (лв.) *</label>
+                        <input type="number" id="price${productCounter}" required min="0" step="0.01" placeholder="0.00" onchange="updateProduct(${productCounter})">
+                    </div>
+                    
+                    <div class="quantity-controls">
+                        <button type="button" class="quantity-btn" onclick="changeQuantity(${productCounter}, -1)">-</button>
+                        <span class="quantity-display" id="quantity${productCounter}">1</span>
+                        <button type="button" class="quantity-btn" onclick="changeQuantity(${productCounter}, 1)">+</button>
+                    </div>
+                    
+                    <div class="product-total" id="productTotal${productCounter}">0.00 лв.</div>
+                </div>
+            `;
+            
+            productsList.appendChild(productDiv);
+            
+            // Add product to products array
+            products.push({
+                id: productCounter,
+                name: '',
+                price: 0,
+                quantity: 1,
+                total: 0
+            });
+            
+            updateTotalPrice();
+        }
+
+        function removeProduct(productId) {
+            const productDiv = document.querySelector(`[data-product-id="${productId}"]`);
+            productDiv.remove();
+            
+            // Remove from products array
+            products = products.filter(p => p.id !== productId);
+            updateTotalPrice();
+        }
+
+        function changeQuantity(productId, change) {
+            const quantitySpan = document.getElementById(`quantity${productId}`);
+            let quantity = parseInt(quantitySpan.textContent) + change;
+            if (quantity < 1) quantity = 1;
+            
+            quantitySpan.textContent = quantity;
+            updateProduct(productId);
+        }
+
+        function updateProduct(productId) {
+            const productSelect = document.getElementById(`product${productId}`);
+            const priceInput = document.getElementById(`price${productId}`);
+            const quantitySpan = document.getElementById(`quantity${productId}`);
+            const totalSpan = document.getElementById(`productTotal${productId}`);
+            
+            const name = productSelect.value;
+            const price = parseFloat(priceInput.value) || 0;
+            const quantity = parseInt(quantitySpan.textContent);
+            const total = (price * quantity).toFixed(2);
+            
+            totalSpan.textContent = total + ' лв.';
+            
+            // Update products array
+            const productIndex = products.findIndex(p => p.id === productId);
+            if (productIndex !== -1) {
+                products[productIndex] = {
+                    id: productId,
+                    name: name,
+                    price: price,
+                    quantity: quantity,
+                    total: parseFloat(total)
+                };
+            }
+            
+            updateTotalPrice();
+        }
+
+        function updateTotalPrice() {
+            const total = products.reduce((sum, product) => sum + product.total, 0);
+            document.getElementById('totalPrice').value = total.toFixed(2) + ' лв.';
+        }
+
+        // Add first product automatically
+        addProduct();
 
         // Handle form submission
         orderForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
+            if (products.length === 0 || products.every(p => !p.name)) {
+                alert('Моля добавете поне един продукт!');
+                return;
+            }
+
             // Get form values
             const customerName = document.getElementById('customerName').value;
             const phone = document.getElementById('phone').value;
-            const office = document.getElementById('office').value;
-            const product = document.getElementById('product').value;
-            const quantity = document.getElementById('quantity').value;
-            const price = parseFloat(document.getElementById('price').value).toFixed(2);
-            const total = (quantity * price).toFixed(2);
+            const deliveryType = document.getElementById('deliveryType').value;
+            const address = document.getElementById('address').value;
 
             // Fill summary
             document.getElementById('summaryName').textContent = customerName;
             document.getElementById('summaryPhone').textContent = phone;
-            document.getElementById('summaryOffice').textContent = office;
-            document.getElementById('summaryProduct').textContent = product;
-            document.getElementById('summaryQuantity').textContent = quantity + ' бр.';
-            document.getElementById('summaryPrice').textContent = price + ' лв.';
-            document.getElementById('summaryTotal').textContent = total + ' лв.';
+            
+            const deliveryTypeText = {
+                'econt': 'Офис на Еконт',
+                'speedy': 'Офис на Спиди',
+                'address': 'До адрес'
+            };
+            document.getElementById('summaryDeliveryType').textContent = deliveryTypeText[deliveryType];
+            
+            const addressRow = document.getElementById('summaryAddressRow');
+            if (deliveryType && address) {
+                document.getElementById('summaryAddress').textContent = address;
+                addressRow.classList.remove('hidden');
+            } else {
+                addressRow.classList.add('hidden');
+            }
+
+            // Fill products summary
+            const summaryProducts = document.getElementById('summaryProducts');
+            summaryProducts.innerHTML = '';
+            
+            let grandTotal = 0;
+            products.filter(p => p.name).forEach(product => {
+                const productRow = document.createElement('div');
+                productRow.className = 'summary-row';
+                productRow.innerHTML = `
+                    <div style="flex: 1;">
+                        <strong>${product.name}</strong><br>
+                        <small>${product.quantity} бр. × ${product.price.toFixed(2)} лв.</small>
+                    </div>
+                    <div style="text-align: right; font-weight: bold;">
+                        ${product.total.toFixed(2)} лв.
+                    </div>
+                `;
+                summaryProducts.appendChild(productRow);
+                grandTotal += product.total;
+            });
+
+            document.getElementById('summaryTotal').textContent = grandTotal.toFixed(2) + ' лв.';
 
             // Set current date
             const now = new Date();
@@ -398,25 +678,28 @@
         });
 
         function shareOrder() {
-            const summaryElement = document.getElementById('orderSummary');
             const name = document.getElementById('summaryName').textContent;
             const phone = document.getElementById('summaryPhone').textContent;
-            const office = document.getElementById('summaryOffice').textContent;
-            const product = document.getElementById('summaryProduct').textContent;
-            const quantity = document.getElementById('summaryQuantity').textContent;
-            const price = document.getElementById('summaryPrice').textContent;
+            const deliveryType = document.getElementById('summaryDeliveryType').textContent;
+            const address = document.getElementById('summaryAddress').textContent;
             const total = document.getElementById('summaryTotal').textContent;
 
-            const text = `ПОРЪЧКА\n\n` +
-                        `КЛИЕНТ:\n` +
-                        `Име: ${name}\n` +
-                        `Телефон: ${phone}\n` +
-                        `Офис: ${office}\n\n` +
-                        `ПОРЪЧКА:\n` +
-                        `Продукт: ${product}\n` +
-                        `Количество: ${quantity}\n` +
-                        `Единична цена: ${price}\n\n` +
-                        `ОБЩА ЦЕНА: ${total}`;
+            let text = `ПОРЪЧКА\n\n`;
+            text += `КЛИЕНТ:\n`;
+            text += `Име: ${name}\n`;
+            text += `Телефон: ${phone}\n`;
+            text += `Доставка: ${deliveryType}\n`;
+            if (address) {
+                text += `Адрес: ${address}\n`;
+            }
+            text += `\nПРОДУКТИ:\n`;
+            
+            products.filter(p => p.name).forEach(product => {
+                text += `• ${product.name}\n`;
+                text += `  ${product.quantity} бр. × ${product.price.toFixed(2)} лв. = ${product.total.toFixed(2)} лв.\n`;
+            });
+            
+            text += `\nОБЩА ЦЕНА: ${total}`;
 
             if (navigator.share) {
                 navigator.share({
@@ -424,22 +707,31 @@
                     text: text
                 }).catch(err => console.log('Error sharing:', err));
             } else {
-                // Fallback - copy to clipboard
                 navigator.clipboard.writeText(text).then(() => {
-                    alert('Поръчката е копирана! Можеш да я споделиш.');
+                    alert('Поръчката е копирана в клипборда');
                 });
             }
         }
 
         function newOrder() {
             // Reset form
-            orderForm.reset();
-            totalPriceInput.value = '';
-
+            document.getElementById('orderForm').reset();
+            
+            // Clear products
+            products = [];
+            productCounter = 0;
+            document.getElementById('productsList').innerHTML = '';
+            
+            // Add first product
+            addProduct();
+            
+            // Hide address field
+            document.getElementById('addressGroup').style.display = 'none';
+            
             // Show form, hide summary
-            document.getElementById('orderSummary').classList.remove('active');
             document.getElementById('formSection').classList.remove('hidden');
-
+            document.getElementById('orderSummary').classList.remove('active');
+            
             // Scroll to top
             window.scrollTo(0, 0);
         }
