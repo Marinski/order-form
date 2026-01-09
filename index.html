@@ -371,6 +371,68 @@
             background: #48bb78;
             margin-bottom: 15px;
         }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .customer-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-icon:active {
+            transform: scale(0.95);
+        }
+
+        .btn-search {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-save {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-icon:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .input-with-button {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .input-with-button input {
+            flex: 1;
+        }
+
+        .input-with-button .btn-icon {
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -379,7 +441,14 @@
             <h1>📦 Нова поръчка</h1>
             
             <form id="orderForm">
-                <h2>👤 Данни за клиент</h2>
+                <div class="section-header">
+                    <h2>👤 Данни за клиент</h2>
+                    <div class="customer-actions">
+                        <button type="button" class="btn-icon btn-save" onclick="saveCustomer()" title="Запази клиент">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
                 
                 <div class="form-group">
                     <label for="customerName">Две имена *</label>
@@ -388,7 +457,12 @@
 
                 <div class="form-group">
                     <label for="phone">Телефон *</label>
-                    <input type="tel" id="phone" required placeholder="0888 123 456">
+                    <div class="input-with-button">
+                        <input type="tel" id="phone" required placeholder="0888 123 456">
+                        <button type="button" class="btn-icon btn-search" onclick="searchCustomer()" title="Търси клиент по телефон">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -415,8 +489,8 @@
                 <button type="button" class="btn btn-add-product" onclick="addProduct()">➕ Добави продукт</button>
 
                 <div class="form-group">
-                    <label for="totalPrice">Обща цена (лв.)</label>
-                    <input type="text" id="totalPrice" readonly placeholder="0.00 лв." class="total-price-input">
+                    <label for="totalPrice">Обща цена (€)</label>
+                    <input type="text" id="totalPrice" readonly placeholder="0.00 €" class="total-price-input">
                 </div>
 
                 <button type="submit" class="btn">Генерирай поръчка</button>
@@ -471,6 +545,118 @@
         let products = [];
         let productCounter = 0;
         const orderForm = document.getElementById('orderForm');
+
+        // Customer database configuration
+        // API endpoint on your server
+        const API_URL = 'https://polynor.bg/order/customers-api.php';
+
+        // Customer database functions
+        async function getCustomerDatabase() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Failed to load');
+                return await response.json();
+            } catch (error) {
+                console.error('Error loading customers:', error);
+                // Fallback to localStorage if server is unavailable
+                const data = localStorage.getItem('customerDatabase');
+                return data ? JSON.parse(data) : { customers: [] };
+            }
+        }
+
+        async function saveCustomerDatabase(database) {
+            // Always save to localStorage as backup
+            localStorage.setItem('customerDatabase', JSON.stringify(database));
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(database)
+                });
+                return response.ok;
+            } catch (error) {
+                console.error('Error saving customers:', error);
+                return false;
+            }
+        }
+
+        async function saveCustomer() {
+            const customerName = document.getElementById('customerName').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const deliveryType = document.getElementById('deliveryType').value;
+            const address = document.getElementById('address').value.trim();
+
+            if (!phone) {
+                alert('Моля въведете телефонен номер за запазване на клиента!');
+                return;
+            }
+
+            if (!customerName) {
+                alert('Моля въведете име на клиента!');
+                return;
+            }
+
+            const database = await getCustomerDatabase();
+            
+            // Check if customer with this phone already exists
+            const existingIndex = database.customers.findIndex(c => c.phone === phone);
+            
+            const customerData = {
+                name: customerName,
+                phone: phone,
+                deliveryType: deliveryType,
+                address: address,
+                updatedAt: new Date().toISOString()
+            };
+
+            if (existingIndex !== -1) {
+                // Update existing customer
+                database.customers[existingIndex] = customerData;
+            } else {
+                // Add new customer
+                database.customers.push(customerData);
+            }
+
+            const saved = await saveCustomerDatabase(database);
+            
+            if (existingIndex !== -1) {
+                alert('Данните на клиента са обновени успешно!');
+            } else {
+                alert('Клиентът е запазен успешно!');
+            }
+        }
+
+        async function searchCustomer() {
+            const phone = document.getElementById('phone').value.trim();
+
+            if (!phone) {
+                alert('Моля въведете телефонен номер за търсене!');
+                return;
+            }
+
+            const database = await getCustomerDatabase();
+            const customer = database.customers.find(c => c.phone === phone);
+
+            if (customer) {
+                document.getElementById('customerName').value = customer.name;
+                document.getElementById('phone').value = customer.phone;
+                document.getElementById('deliveryType').value = customer.deliveryType || '';
+                
+                // Trigger address field visibility
+                toggleAddressField();
+                
+                if (customer.address) {
+                    document.getElementById('address').value = customer.address;
+                }
+                
+                alert('Клиентът е намерен и данните са попълнени!');
+            } else {
+                alert('Не е намерен клиент с този телефонен номер.');
+            }
+        }
 
         const productOptions = [
             'Polynor Pro',
@@ -531,11 +717,11 @@
                     </div>
                     
                     <div class="form-group price-input">
-                        <label>Цена (лв.) *</label>
+                        <label>Цена (€) *</label>
                         <input type="number" id="price${productCounter}" required min="0" step="0.01" placeholder="0.00" onchange="updateProduct(${productCounter})">
                     </div>
                     
-                    <div class="product-total" id="productTotal${productCounter}">0.00 лв.</div>
+                    <div class="product-total" id="productTotal${productCounter}">0.00 €</div>
                 </div>
             `;
             
@@ -580,7 +766,7 @@
             
             const total = (price * quantity).toFixed(2);
             
-            totalSpan.textContent = total + ' лв.';
+            totalSpan.textContent = total + ' €';
             
             // Update products array
             const productIndex = products.findIndex(p => p.id === productId);
@@ -599,7 +785,7 @@
 
         function updateTotalPrice() {
             const total = products.reduce((sum, product) => sum + product.total, 0);
-            document.getElementById('totalPrice').value = total.toFixed(2) + ' лв.';
+            document.getElementById('totalPrice').value = total.toFixed(2) + ' €';
         }
 
         // Add first product automatically
@@ -650,17 +836,17 @@
                 productRow.innerHTML = `
                     <div style="flex: 1;">
                         <strong>${product.name}</strong><br>
-                        <small>${product.quantity} бр. × ${product.price.toFixed(2)} лв.</small>
+                        <small>${product.quantity} бр. × ${product.price.toFixed(2)} €</small>
                     </div>
                     <div style="text-align: right; font-weight: bold;">
-                        ${product.total.toFixed(2)} лв.
+                        ${product.total.toFixed(2)} €
                     </div>
                 `;
                 summaryProducts.appendChild(productRow);
                 grandTotal += product.total;
             });
 
-            document.getElementById('summaryTotal').textContent = grandTotal.toFixed(2) + ' лв.';
+            document.getElementById('summaryTotal').textContent = grandTotal.toFixed(2) + ' €';
 
             // Set current date
             const now = new Date();
@@ -700,7 +886,7 @@
             
             products.filter(p => p.name).forEach(product => {
                 text += `• ${product.name}\n`;
-                text += `  ${product.quantity} бр. × ${product.price.toFixed(2)} лв. = ${product.total.toFixed(2)} лв.\n`;
+                text += `  ${product.quantity} бр. × ${product.price.toFixed(2)} € = ${product.total.toFixed(2)} €\n`;
             });
             
             text += `\nОБЩА ЦЕНА: ${total}`;
